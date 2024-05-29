@@ -2,12 +2,17 @@ const express = require('express');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const http = require('http');
+
 
 const app = express();
 const port = 5002;
 
 const CHECKOUT_API_URL = 'https://api.sandbox.checkout.com';
 const CHECKOUT_SECRET_KEY = 'sk_sbox_3g2rgzrnw5p6nnwmywuyr5bknyu'; // Ensure this is your correct secret key
+const WEBHOOK_URL = 'https://4fa4-183-247-7-131.ngrok-free.app/webhook'; // Use your ngrok URL
+
+let paymentStatus = { status: 'Pending' };
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -17,6 +22,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
+
+const server = http.createServer(app);
+
 
 app.post('/create-payment-session', async (req, res) => {
   try {
@@ -32,7 +40,8 @@ app.post('/create-payment-session', async (req, res) => {
         billing,
         customer,
         success_url,
-        failure_url
+        failure_url,
+        '3ds': { enabled: true } // Enable 3DS
       },
       {
         headers: {
@@ -69,12 +78,23 @@ app.get('/payment-details/:paymentId', async (req, res) => {
   }
 });
 
+app.get('/payment-status', (req, res) => {
+  try {
+    res.json(paymentStatus);
+  } catch (error) {
+    console.error('Error fetching payment details:', error.response ? error.response.data : error.message);
+    res.status(error.response ? error.response.status : 500).json({ error: error.response ? error.response.data : 'Internal Server Error' });
+  }
+});
+
+
+
 app.post('/webhook', (req, res) => {
   const event = req.body;
+  console.log('Webhook event received:', event);
+  paymentStatus = event.type;
 
-  console.log('Received webhook event:', event);
-
-  res.status(200).end();
+  res.sendStatus(200);
 });
 
 app.listen(port, () => {
