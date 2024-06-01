@@ -10,7 +10,7 @@ const port = 5002;
 const CHECKOUT_API_URL = 'https://api.sandbox.checkout.com';
 const CHECKOUT_SECRET_KEY = 'sk_sbox_3g2rgzrnw5p6nnwmywuyr5bknyu'; 
 
-let paymentStatus = { status: 'Pending' };
+let paymentStatus = 'Pending';
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -82,11 +82,25 @@ app.get('/payment-status', (req, res) => {
   }
 });
 
+app.post('/clear-payment-status', (req, res) => {
+  try {
+    paymentStatus = 'Pending';
+    console.log("payment status cleared!")
+    res.status(200).json('clear payment status successful')
+  } catch (error) {
+    console.error('clearing payment status failed');
+    res.status(error.response ? error.response.status : 500).json({ error: error.response ? error.response.data : 'Internal Server Error' });
+  }
+});
+
 app.post('/webhook', (req, res) => {
   const event = req.body;
   console.log('Webhook event received:', event);
-  paymentStatus = event.type;
-
+  if (paymentStatus === 'payment_captured' || paymentStatus === 'payment_declined') {
+    console.log("reached terminal state already: " + event.type);
+  } else {
+    paymentStatus = event.type;
+  }
   res.sendStatus(200);
 });
 
