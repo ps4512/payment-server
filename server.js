@@ -10,7 +10,7 @@ const port = 5002;
 const CHECKOUT_API_URL = 'https://api.sandbox.checkout.com';
 const CHECKOUT_SECRET_KEY = 'sk_sbox_3g2rgzrnw5p6nnwmywuyr5bknyu'; 
 
-let paymentStatus = 'Pending';
+let paymentStatus = 'Pending...';
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -37,7 +37,7 @@ app.post('/create-payment-session', async (req, res) => {
         customer,
         success_url,
         failure_url,
-        '3ds': { enabled: true } // Enable 3DS
+        // '3ds': { enabled: true } // Enable 3DS
       },
       {
         headers: {
@@ -85,7 +85,6 @@ app.get('/payment-status', (req, res) => {
 app.post('/clear-payment-status', (req, res) => {
   try {
     paymentStatus = 'Pending';
-    console.log("payment status cleared!")
     res.status(200).json('clear payment status successful')
   } catch (error) {
     console.error('clearing payment status failed');
