@@ -3,17 +3,18 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const http = require('http');
+// Require the parts of the module you want to use
+const { Client, CheckoutAPI } = require('@adyen/api-library');
 
 const app = express();
 const port = 5002;
 
-const CHECKOUT_API_URL = 'https://api.sandbox.checkout.com';
-const CHECKOUT_SECRET_KEY = 'sk_sbox_3g2rgzrnw5p6nnwmywuyr5bknyu'; 
+const API_KEY = 'AQEyhmfxJ4zKYhZGw0m/n3Q5qf3VaY9UCJ1+XWZe9W27jmlZip5TikRFk3cZ+20K9+E1S5MQwV1bDb7kfNy1WIxIIkxgBw==-ccCh0rfAJNX1LFcGi/K2q/jAc3mCwtjsaCMlgscRjuo=-i1iy~5fdmv?@)XSsy%A'; 
 
 let paymentStatus = 'Pending...';
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: 'https://3000-ps4512-paymentpage-n19h2oaqgu9.ws-us116.gitpod.io/',
   methods: 'GET,POST',
   allowedHeaders: 'Content-Type,Authorization'
 };
@@ -21,6 +22,34 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
+app.post('/payment-methods', async (req, res) => {
+  try {
+
+    console.log("hello there")
+    // Initialize the client object
+    // For the live environment, additionally include your liveEndpointUrlPrefix.
+    const client = new Client({apiKey: API_KEY, environment: "TEST"});
+
+    // Create the request object(s)
+    const paymentMethodsRequest = {
+      merchantAccount: "AdyenTechSupport_PengShao_TEST",
+      countryCode: "NL",
+      amount: {
+        currency: "EUR",
+        value: 1000
+      },
+      channel: "Web",
+      shopperLocale: "nl-NL"
+    }
+    // Send the request
+    const checkoutAPI = new CheckoutAPI(client);
+    const response = checkoutAPI.PaymentsApi.paymentMethods(paymentMethodsRequest, { idempotencyKey: "UUID" });
+    console.log(await response)
+  } catch (error) {
+    console.error('Error creating payment session:', error.response ? error.response.data : error.message);
+    res.status(error.response ? error.response.status : 500).json({ error: error.response ? error.response.data : 'Internal Server Error' });
+  }
+});
 
 app.post('/create-payment-session', async (req, res) => {
   try {
