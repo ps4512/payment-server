@@ -44,27 +44,11 @@ app.post('/payments', async (req, res) => {
     // For the live environment, additionally include your liveEndpointUrlPrefix.
     const client = new Client({apiKey: API_KEY, environment: "TEST"});
     
-    // Create the request object(s)
-    const paymentRequest = {
-      amount: {
-        currency: "EUR",
-        value: 1000
-      },
-      reference: "Your order number",
-      paymentMethod: {
-        type: "scheme",
-        number: "4111111111111111",
-        expiryMonth: "03",
-        expiryYear: "2030",
-        cvc: "737"
-      },
-      "returnUrl": "https://your-company.com/...",
-      "merchantAccount": "AdyenTechSupport_PengShao_TEST"
-     }
-    
     // Send the request
     const checkoutAPI = new CheckoutAPI(client);
-    const response = checkoutAPI.PaymentsApi.payments(paymentRequest);
+    const response = await checkoutAPI.PaymentsApi.payments(req.body);
+    console.log(new Date().toLocaleTimeString());
+    console.log(response);
     res.json(response);
 
   } catch (error) {
