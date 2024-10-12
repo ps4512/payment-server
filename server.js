@@ -57,6 +57,29 @@ app.post('/payments', async (req, res) => {
   }
 });
 
+app.post('/payment-details', async (req, res) => {
+  try {
+    const client = new Client({apiKey: API_KEY, environment: "TEST"});
+    console.log("redirect result is: " + req.body.redirectResult)
+ 
+    // Create the request object(s)
+    const paymentDetailsRequest = {
+      details: {
+        redirectResult: req.body.redirectResult
+      }
+    }
+     
+    // Send the request
+    const checkoutAPI = new CheckoutAPI(client);
+    const response = await checkoutAPI.PaymentsApi.paymentsDetails(paymentDetailsRequest);
+    console.log(response)
+    res.json(response);    
+
+  } catch (error) {
+    console.error('Error creating payment session:', error);
+    res.status(error.response ? error.response.status : 500).json({ error: error.response ? error.response.data : 'Internal Server Error' });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
