@@ -26,7 +26,8 @@ app.post('/payment-methods', async (req, res) => {
       countryCode: "NL",
       amount: { currency: "EUR", value: 1000 },
       channel: "Web",
-      shopperLocale: "nl-NL"
+      shopperLocale: "nl-NL",
+      shopperReference: "Peng_Shao_Shopper_Reference",
     };
 
     const checkoutAPI = new CheckoutAPI(client);
@@ -60,6 +61,7 @@ app.post('/payments', async (req, res) => {
 app.post('/payment-details', async (req, res) => {
   try {
     const client = new Client({apiKey: API_KEY, environment: "TEST"});
+    console.log(new Date().toLocaleTimeString());
     console.log("redirect result is: " + req.body.redirectResult)
  
     // Create the request object(s)
@@ -78,6 +80,19 @@ app.post('/payment-details', async (req, res) => {
   } catch (error) {
     console.error('Error creating payment session:', error);
     res.status(error.response ? error.response.status : 500).json({ error: error.response ? error.response.data : 'Internal Server Error' });
+  }
+});
+
+app.post('/webhook', async (req, res) => {
+  try {
+      req.body.notificationItems.forEach(item => {
+        console.log(new Date().toLocaleTimeString());
+        console.log(item);
+      })
+      res.sendStatus(200);
+  } catch (error) {
+    console.error('Error receiving webhook:', error);
+    res.status(error.response ? error.response.status : 500).json('Internal Server Error' );
   }
 });
 
