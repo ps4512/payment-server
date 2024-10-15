@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const { Client, CheckoutAPI } = require('@adyen/api-library');
+const { hmacValidator } = require('@adyen/api-library');
+
 
 const app = express();
 const port = 5002;
@@ -85,11 +87,26 @@ app.post('/payment-details', async (req, res) => {
 
 app.post('/webhook', async (req, res) => {
   try {
-      req.body.notificationItems.forEach(item => {
+      // YOUR_HMAC_KEY from the Customer Area
+      const hmacKey = "9B3A27ACBC7D081A15EAB91C71898E166A81321D82705AC24632CC644EA2E01F";
+      const validator = new hmacValidator()
+      // Notification Request JSON
+      const notificationRequest = req.body;
+      const notificationRequestItems = notificationRequest.notificationItems
+      // Handling multiple notificationRequests
+      notificationRequestItems.forEach(function(notificationRequestItem) {
         console.log(new Date().toLocaleTimeString());
-        console.log(item);
-      })
-      res.sendStatus(200);
+        console.log(notificationRequestItem); 
+          // Handle the notification
+          if( validator.validateHMAC(notificationRequestItem, hmacKey) ) {
+              // Process the notification based on the eventCode
+              res.sendStatus(200);        
+             } else {
+              // Non valid NotificationRequest
+              console.log("Non valid NotificationRequest");
+              res.sendStatus(403);
+          }
+      });
   } catch (error) {
     console.error('Error receiving webhook:', error);
     res.status(error.response ? error.response.status : 500).json('Internal Server Error' );
