@@ -25,11 +25,11 @@ app.post('/payment-methods', async (req, res) => {
     
     const paymentMethodsRequest = {
       merchantAccount: "AdyenTechSupport_PengShao_TEST",
-      countryCode: "NL",
+      countryCode: "DE",
       amount: { currency: "EUR", value: 1000 },
       channel: "Web",
       shopperLocale: "nl-NL",
-      shopperReference: "Peng_Shao_Shopper_Reference",
+      shopperReference: "Peng_Shao_Shopper_Reference_New",
     };
 
     const checkoutAPI = new CheckoutAPI(client);
@@ -44,12 +44,15 @@ app.post('/payment-methods', async (req, res) => {
 
 app.post('/payments', async (req, res) => {
   try {
+    console.log(1);
     // For the live environment, additionally include your liveEndpointUrlPrefix.
     const client = new Client({apiKey: API_KEY, environment: "TEST"});
-    
+    console.log(2);
     // Send the request
     const checkoutAPI = new CheckoutAPI(client);
+    console.log(3);
     const response = await checkoutAPI.PaymentsApi.payments(req.body);
+    console.log(4);
     console.log(new Date().toLocaleTimeString());
     console.log(response);
     res.json(response);
@@ -88,8 +91,8 @@ app.post('/payment-details', async (req, res) => {
 app.post('/webhook', async (req, res) => {
   try {
       // YOUR_HMAC_KEY from the Customer Area
-      const hmacKey = "9B3A27ACBC7D081A15EAB91C71898E166A81321D82705AC24632CC644EA2E01F";
-      const validator = new hmacValidator()
+      //const hmacKey = "9B3A27ACBC7D081A15EAB91C71898E166A81321D82705AC24632CC644EA2E01F";
+      //const validator = new hmacValidator()
       // Notification Request JSON
       const notificationRequest = req.body;
       const notificationRequestItems = notificationRequest.notificationItems
@@ -98,14 +101,14 @@ app.post('/webhook', async (req, res) => {
         console.log(new Date().toLocaleTimeString());
         console.log(notificationRequestItem); 
           // Handle the notification
-          if( validator.validateHMAC(notificationRequestItem, hmacKey) ) {
+          //if( validator.validateHMAC(notificationRequestItem, hmacKey) ) {
               // Process the notification based on the eventCode
-              res.sendStatus(200);        
-             } else {
+            //  res.sendStatus(200);        
+            // } else {
               // Non valid NotificationRequest
-              console.log("Non valid NotificationRequest");
-              res.sendStatus(403);
-          }
+             // console.log("Non valid NotificationRequest");
+             // res.sendStatus(403);
+         // }
       });
   } catch (error) {
     console.error('Error receiving webhook:', error);
