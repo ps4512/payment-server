@@ -2,12 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const { Client, CheckoutAPI } = require('@adyen/api-library');
 const { hmacValidator } = require('@adyen/api-library');
+const { ThreeDS2RequestData } = require('@adyen/api-library/lib/src/typings/checkout/threeDS2RequestData');
 
 
 const app = express();
 const port = 5002;
 
-const API_KEY = 'AQEyhmfxJ4zKYhZGw0m/n3Q5qf3VaY9UCJ1+XWZe9W27jmlZip5TikRFk3cZ+20K9+E1S5MQwV1bDb7kfNy1WIxIIkxgBw==-sAIyvIubQ7qhOdD4/IAtYSzq9BylzjOEg3aspmb1Q9g=-i1iawJ]jGT,74P(sYW8';
+const API_KEY = 'AQEyhmfxL4vNaxJBw0m/n3Q5qf3VaY9UCJ1+XWZe9W27jmlZinc+0PZFlKmC3gqzZnN3pIEQwV1bDb7kfNy1WIxIIkxgBw==-kQxJKSHpH1fGBAcfmWTwfVxiot10UVHO1+09k1QJvxA=-i1i5=5qbaFP68g>2gCD';
 
 app.use(cors()); // Allow all origins temporarily
 app.use(express.json());
@@ -19,17 +20,53 @@ app.options('*', (req, res) => {
   res.sendStatus(200); // Respond with 200 OK
 });
 
+app.post('/sessions', async (req, res) => {
+  // For the live environment, additionally include your liveEndpointUrlPrefix.
+const client = new Client({apiKey: API_KEY, environment: "TEST"});
+ 
+// Create the request object(s)
+const createCheckoutSessionRequest = {
+  merchantAccount: "AdyenTechSupport_PengAfPMarketplace_TEST",
+  amount: {
+    value: 100,
+    currency: "EUR"
+  },
+  returnUrl: "https://google.com",
+  reference: "YOUR_PAYMENT_REFERENCE",
+  countryCode: "NL",
+  shopperReference: "YOUR_SHOPPER_REFERENCE",
+  storePaymentMethodMode: "enabled",
+  shopperInteraction: "Ecommerce",
+  recurringProcessingModel: "CardOnFile",
+  // authenticationData: {
+  //   threeDSRequestData: {
+  //     nativeThreeDS: "preferred"
+  //   }
+  // }
+}
+ 
+// Send the request
+const checkoutAPI = new CheckoutAPI(client);
+const response = checkoutAPI.PaymentsApi.sessions(createCheckoutSessionRequest);
+const session = await response
+res.json(session);
+
+})
+
 app.post('/payment-methods', async (req, res) => {
   try {
     const client = new Client({ apiKey: API_KEY, environment: "TEST" });
     
     const paymentMethodsRequest = {
-      merchantAccount: "AdyenTechSupport_PengShao_TEST",
+      merchantAccount: "AdyenTechSupport_PengAfPMarketplace_TEST",
       countryCode: "DE",
-      amount: { currency: "EUR", value: 1000 },
+      amount: { currency: "EUR", value: 100 },
       channel: "Web",
       shopperLocale: "nl-NL",
       shopperReference: "Peng_Shao_Shopper_Reference_New",
+      additionalData: {
+        authorisationType: "PreAuth"
+     }
     };
 
     const checkoutAPI = new CheckoutAPI(client);
@@ -67,18 +104,12 @@ app.post('/payment-details', async (req, res) => {
   try {
     const client = new Client({apiKey: API_KEY, environment: "TEST"});
     console.log(new Date().toLocaleTimeString());
-    console.log("redirect result is: " + req.body.redirectResult)
+    console.log("redirect result is: " + JSON.stringify(req.body.redirectResult))
  
-    // Create the request object(s)
-    const paymentDetailsRequest = {
-      details: {
-        redirectResult: req.body.redirectResult
-      }
-    }
      
     // Send the request
     const checkoutAPI = new CheckoutAPI(client);
-    const response = await checkoutAPI.PaymentsApi.paymentsDetails(paymentDetailsRequest);
+    const response = await checkoutAPI.PaymentsApi.paymentsDetails(req.body.redirectResult);
     console.log(response)
     res.json(response);    
 
