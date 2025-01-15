@@ -49,6 +49,7 @@ const createCheckoutSessionRequest = {
 const checkoutAPI = new CheckoutAPI(client);
 const response = checkoutAPI.PaymentsApi.sessions(createCheckoutSessionRequest);
 const session = await response
+console.log(session)
 res.json(session);
 
 })
