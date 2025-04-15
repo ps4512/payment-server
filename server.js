@@ -8,7 +8,7 @@ const { ThreeDS2RequestData } = require('@adyen/api-library/lib/src/typings/chec
 const app = express();
 const port = 5002;
 
-const API_KEY = 'AQEyhmfxL4vNaxJBw0m/n3Q5qf3VaY9UCJ1+XWZe9W27jmlZinc+0PZFlKmC3gqzZnN3pIEQwV1bDb7kfNy1WIxIIkxgBw==-kQxJKSHpH1fGBAcfmWTwfVxiot10UVHO1+09k1QJvxA=-i1i5=5qbaFP68g>2gCD';
+const API_KEY = 'AQEyhmfxJ4zKYhZGw0m/n3Q5qf3VaY9UCJ1+XWZe9W27jmlZip5TikRFk3cZ+20K9+E1S5MQwV1bDb7kfNy1WIxIIkxgBw==-qMVyDCRgukC6IURlATdxHB9a20z4UMKyTQFYksiikgo=-i1ih$AA83{:38q9JcaX';
 
 app.use(cors()); // Allow all origins temporarily
 app.use(express.json());
@@ -23,33 +23,33 @@ app.options('*', (req, res) => {
 app.post('/sessions', async (req, res) => {
   // For the live environment, additionally include your liveEndpointUrlPrefix.
 const client = new Client({apiKey: API_KEY, environment: "TEST"});
+
+console.log(req.body)
  
 // Create the request object(s)
 const createCheckoutSessionRequest = {
-  merchantAccount: "AdyenTechSupport_PengAfPMarketplace_TEST",
+  merchantAccount: "AdyenTechSupport_PengShao_TEST",
   amount: {
     value: 100,
-    currency: "EUR"
+    currency: 'USD'
   },
-  returnUrl: "https://google.com",
-  reference: "YOUR_PAYMENT_REFERENCE",
-  countryCode: "NL",
-  shopperReference: "YOUR_SHOPPER_REFERENCE",
+  //splitCardFundingSources: "true",
+  returnUrl: "www.google.com",
+  reference: "your reference",
+  countryCode: "US",
+  shopperReference: "YOUR_SHOPPER_REFERENCE_NEW_1",
   storePaymentMethodMode: "enabled",
   shopperInteraction: "Ecommerce",
-  recurringProcessingModel: "CardOnFile",
-  // authenticationData: {
-  //   threeDSRequestData: {
-  //     nativeThreeDS: "preferred"
-  //   }
-  // }
+  recurringProcessingModel: "Subscription",
+  store: req.body.store,
 }
+
+console.log(createCheckoutSessionRequest)
  
 // Send the request
 const checkoutAPI = new CheckoutAPI(client);
 const response = checkoutAPI.PaymentsApi.sessions(createCheckoutSessionRequest);
 const session = await response
-console.log(session)
 res.json(session);
 
 })
@@ -59,12 +59,12 @@ app.post('/payment-methods', async (req, res) => {
     const client = new Client({ apiKey: API_KEY, environment: "TEST" });
     
     const paymentMethodsRequest = {
-      merchantAccount: "AdyenTechSupport_PengAfPMarketplace_TEST",
-      countryCode: "DE",
+      merchantAccount: "AdyenTechSupport_PengShao_TEST",
+      countryCode: "NL",
       amount: { currency: "EUR", value: 100 },
       channel: "Web",
       shopperLocale: "nl-NL",
-      shopperReference: "Peng_Shao_Shopper_Reference_New",
+      shopperReference: "Peng_Shao_Shopper_Reference_New_200",
       additionalData: {
         authorisationType: "PreAuth"
      }
@@ -82,17 +82,12 @@ app.post('/payment-methods', async (req, res) => {
 
 app.post('/payments', async (req, res) => {
   try {
-    console.log(1);
     // For the live environment, additionally include your liveEndpointUrlPrefix.
+    console.log(req);
     const client = new Client({apiKey: API_KEY, environment: "TEST"});
-    console.log(2);
     // Send the request
     const checkoutAPI = new CheckoutAPI(client);
-    console.log(3);
     const response = await checkoutAPI.PaymentsApi.payments(req.body);
-    console.log(4);
-    console.log(new Date().toLocaleTimeString());
-    console.log(response);
     res.json(response);
 
   } catch (error) {
@@ -104,14 +99,10 @@ app.post('/payments', async (req, res) => {
 app.post('/payment-details', async (req, res) => {
   try {
     const client = new Client({apiKey: API_KEY, environment: "TEST"});
-    console.log(new Date().toLocaleTimeString());
-    console.log("redirect result is: " + JSON.stringify(req.body.redirectResult))
  
-     
     // Send the request
     const checkoutAPI = new CheckoutAPI(client);
     const response = await checkoutAPI.PaymentsApi.paymentsDetails(req.body.redirectResult);
-    console.log(response)
     res.json(response);    
 
   } catch (error) {
@@ -130,8 +121,6 @@ app.post('/webhook', async (req, res) => {
       const notificationRequestItems = notificationRequest.notificationItems
       // Handling multiple notificationRequests
       notificationRequestItems.forEach(function(notificationRequestItem) {
-        console.log(new Date().toLocaleTimeString());
-        console.log(notificationRequestItem); 
           // Handle the notification
           //if( validator.validateHMAC(notificationRequestItem, hmacKey) ) {
               // Process the notification based on the eventCode
@@ -143,7 +132,6 @@ app.post('/webhook', async (req, res) => {
          // }
       });
   } catch (error) {
-    console.error('Error receiving webhook:', error);
     res.status(error.response ? error.response.status : 500).json('Internal Server Error' );
   }
 });
