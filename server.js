@@ -8,7 +8,8 @@ const { ThreeDS2RequestData } = require('@adyen/api-library/lib/src/typings/chec
 const app = express();
 const port = 5002;
 
-const API_KEY = 'AQEyhmfxJ4zKYhZGw0m/n3Q5qf3VaY9UCJ1+XWZe9W27jmlZip5TikRFk3cZ+20K9+E1S5MQwV1bDb7kfNy1WIxIIkxgBw==-qMVyDCRgukC6IURlATdxHB9a20z4UMKyTQFYksiikgo=-i1ih$AA83{:38q9JcaX';
+//const API_KEY = 'AQEyhmfxJ4zKYhZGw0m/n3Q5qf3VaY9UCJ1+XWZe9W27jmlZip5TikRFk3cZ+20K9+E1S5MQwV1bDb7kfNy1WIxIIkxgBw==-qMVyDCRgukC6IURlATdxHB9a20z4UMKyTQFYksiikgo=-i1ih$AA83{:38q9JcaX';
+const API_KEY = 'AQEthmfxKIzGYhVHw0m/n3Q5qf3VfI5eGbBFVXVXyGH23esz7LC6GeMeOrKZKEEZEMFdWw2+5HzctViMSCJMYAc=-Th4zuW+nfkEXbiAQLhkoY3sqh4Ad7qrhGgXjTdc+PIw=-i1iuG&$%>B7V{8GQLG;'
 
 app.use(cors()); // Allow all origins temporarily
 app.use(express.json());
@@ -22,23 +23,22 @@ app.options('*', (req, res) => {
 
 app.post('/sessions', async (req, res) => {
   // For the live environment, additionally include your liveEndpointUrlPrefix.
-const client = new Client({apiKey: API_KEY, environment: "TEST"});
+const client = new Client({apiKey: API_KEY, environment: "LIVE", liveEndpointUrlPrefix: "7cc06625ff786a83-TestCompany"});
 
 console.log(req.body)
  
 // Create the request object(s)
 const createCheckoutSessionRequest = {
-  merchantAccount: "AdyenTechSupport_PengShao_TEST",
+  merchantAccount: "TestMerchant",
   amount: {
-    value: 100,
-    currency: 'USD'
+    value: 100000,
+    currency: 'THB'
   },
   //splitCardFundingSources: "true",
-  returnUrl: "www.google.com",
+  returnUrl: "https://www.google.com",
   reference: "your reference",
-  countryCode: "US",
-  shopperReference: "YOUR_SHOPPER_REFERENCE_NEW_1",
-  storePaymentMethodMode: "enabled",
+  countryCode: "TH",
+  storePaymentMethodMode: "askForConsent",
   shopperInteraction: "Ecommerce",
   recurringProcessingModel: "Subscription",
   store: req.body.store,
@@ -56,12 +56,12 @@ res.json(session);
 
 app.post('/payment-methods', async (req, res) => {
   try {
-    const client = new Client({ apiKey: API_KEY, environment: "TEST" });
+    const client = new Client({ apiKey: API_KEY, environment: "LIVE" });
     
     const paymentMethodsRequest = {
       merchantAccount: "AdyenTechSupport_PengShao_TEST",
-      countryCode: "NL",
-      amount: { currency: "EUR", value: 100 },
+      countryCode: "TH",
+      amount: { currency: "THB", value: 0 },
       channel: "Web",
       shopperLocale: "nl-NL",
       shopperReference: "Peng_Shao_Shopper_Reference_New_200",
@@ -84,7 +84,7 @@ app.post('/payments', async (req, res) => {
   try {
     // For the live environment, additionally include your liveEndpointUrlPrefix.
     console.log(req);
-    const client = new Client({apiKey: API_KEY, environment: "TEST"});
+    const client = new Client({apiKey: API_KEY, environment: "LIVE"});
     // Send the request
     const checkoutAPI = new CheckoutAPI(client);
     const response = await checkoutAPI.PaymentsApi.payments(req.body);
@@ -98,7 +98,7 @@ app.post('/payments', async (req, res) => {
 
 app.post('/payment-details', async (req, res) => {
   try {
-    const client = new Client({apiKey: API_KEY, environment: "TEST"});
+    const client = new Client({apiKey: API_KEY, environment: "LIVE"});
  
     // Send the request
     const checkoutAPI = new CheckoutAPI(client);
