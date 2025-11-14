@@ -8,7 +8,7 @@ const { ThreeDS2RequestData } = require('@adyen/api-library/lib/src/typings/chec
 const app = express();
 const port = 5002;
 
-const API_KEY = 'AQEyhmfxJ4zKYhZGw0m/n3Q5qf3VaY9UCJ1+XWZe9W27jmlZip5TikRFk3cZ+20K9+E1S5MQwV1bDb7kfNy1WIxIIkxgBw==-qMVyDCRgukC6IURlATdxHB9a20z4UMKyTQFYksiikgo=-i1ih$AA83{:38q9JcaX';
+const API_KEY = 'AQEqhmfxLI/NaBdDw0m/n3Q5qf3VeI5DCqBCWWov3zO/6oAS20hwOHS7uqhPEMFdWw2+5HzctViMSCJMYAc=-XgKKv1cMFPROMLs/ySDC1+zGCEDOfMHtGv4w6iD5xY4=-i1i>X)q4<jRbQvv$(4p';
 //const API_KEY = 'AQEthmfxKIzGYhVHw0m/n3Q5qf3VfI5eGbBFVXVXyGH23esz7LC6GeMeOrKZKEEZEMFdWw2+5HzctViMSCJMYAc=-Th4zuW+nfkEXbiAQLhkoY3sqh4Ad7qrhGgXjTdc+PIw=-i1iuG&$%>B7V{8GQLG;'
 
 app.use(cors()); // Allow all origins temporarily
@@ -29,10 +29,10 @@ console.log(req.body)
  
 // Create the request object(s)
 const createCheckoutSessionRequest = {
-  merchantAccount: "TestMerchant",
+  merchantAccount: "PengShao_SGPartner_TEST",
   amount: {
     value: 100000,
-    currency: 'THB'
+    currency: 'SGD'
   },
   //splitCardFundingSources: "true",
   returnUrl: "https://www.google.com",
@@ -59,9 +59,9 @@ app.post('/payment-methods', async (req, res) => {
     const client = new Client({ apiKey: API_KEY, environment: "TEST" });
     
     const paymentMethodsRequest = {
-      merchantAccount: "AdyenTechSupport_PengShao_TEST",
+      merchantAccount: "PengShao_SGPartner_TEST",
       countryCode: "TH",
-      amount: { currency: "THB", value: 0 },
+      amount: { currency: "SGD", value: 0 },
       channel: "Web",
       shopperLocale: "nl-NL",
       shopperReference: "Peng_Shao_Shopper_Reference_New_200",
